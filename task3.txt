@@ -1,0 +1,10 @@
+def multiply_and_add(num1, num2):
+    product = num1 * num2
+    result = product + num2
+    return result
+
+def calculate (num1, num2):
+    sum_result = num1 + num2
+    custom_result = multiply_and_add(num1, num2)
+    return sum_result, custom_result
+
