@@ -1,0 +1,197 @@
+-- Create Customers Table
+CREATE TABLE Customers (
+    customer_id SERIAL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    phone VARCHAR(15),
+    address TEXT NOT NULL
+);
+
+--Create Categories Table
+CREATE TABLE Categories (
+    category_id SERIAL PRIMARY KEY,
+    category_name VARCHAR(100) NOT NULL
+);
+
+-- Create Products Table
+CREATE TABLE Products (
+    product_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    price DECIMAL(10, 2) NOT NULL CHECK (price > 0),
+    stock INT NOT NULL CHECK (stock >= 0),
+    category_id INT REFERENCES Categories(category_id) ON DELETE SET NULL
+);
+
+-- Create Orders Table
+CREATE TABLE Orders (
+    order_id SERIAL PRIMARY KEY,
+    customer_id INT REFERENCES Customers(customer_id) ON DELETE CASCADE,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_amount DECIMAL(10, 2) NOT NULL CHECK (total_amount >= 0)
+);
+
+-- Create Order_Items Table
+CREATE TABLE Order_Items (
+    order_item_id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES Orders(order_id) ON DELETE CASCADE,
+    product_id INT REFERENCES Products(product_id) ON DELETE CASCADE,
+    quantity INT NOT NULL CHECK (quantity > 0),
+    price DECIMAL(10, 2) NOT NULL CHECK (price > 0)
+);
+
+-- Insert 5 Product Categories
+INSERT INTO Categories (category_name) VALUES
+('Smartphones'),
+('Laptops'),
+('Accessories'),
+('Tablets'),
+('Gaming Consoles');
+
+-- Insert 10 Products
+INSERT INTO Products (name, description, price, stock, category_id) VALUES
+('iPhone 15', 'Latest Apple smartphone', 999.99, 100, 1),
+('Samsung Galaxy S23', 'Flagship Android smartphone', 899.99, 80, 1),
+('MacBook Pro 16"', 'High-performance Apple laptop', 1999.99, 50, 2),
+('Dell XPS 15', 'Premium Windows laptop', 1499.99, 60, 2),
+('USB-C Cable', 'High-speed charging cable', 19.99, 200, 3),
+('Wireless Mouse', 'Ergonomic wireless mouse', 29.99, 150, 3),
+('iPad Pro', 'Powerful Apple tablet', 799.99, 70, 4),
+('Samsung Galaxy Tab S8', 'Premium Android tablet', 699.99, 90, 4),
+('PlayStation 5', 'Next-gen gaming console', 499.99, 30, 5),
+('Xbox Series X', 'High-performance gaming console', 499.99, 40, 5);
+
+-- Insert 8 Customers
+INSERT INTO Customers (first_name, last_name, email, phone, address) VALUES
+('John', 'Doe', 'john.doe@example.com', '123-456-7890', '123 Main St'),
+('Jane', 'Smith', 'jane.smith@example.com', '987-654-3210', '456 Elm St'),
+('Alice', 'Johnson', 'alice.johnson@example.com', '555-123-4567', '789 Oak St'),
+('Bob', 'Brown', 'bob.brown@example.com', '555-987-6543', '321 Pine St'),
+('Charlie', 'Davis', 'charlie.davis@example.com', '555-555-5555', '654 Cedar St'),
+('Diana', 'Evans', 'diana.evans@example.com', '555-111-2222', '987 Birch St'),
+('Eve', 'Garcia', 'eve.garcia@example.com', '555-333-4444', '321 Maple St'),
+('Frank', 'Harris', 'frank.harris@example.com', '555-666-7777', '654 Walnut St');
+
+-- Insert 12 Orders
+INSERT INTO Orders (customer_id, total_amount) VALUES
+(1, 1019.98),  
+(2, 1999.99),  
+(3, 899.99),   
+(4, 1499.99),  
+(5, 49.98),    
+(6, 799.99),   
+(7, 699.99),   
+(8, 499.99),   
+(1, 499.99),   
+(2, 1029.98), 
+(3, 2499.98),  
+(4, 119.97);   
+
+-- Insert Order Items
+INSERT INTO Order_Items (order_id, product_id, quantity, price) VALUES
+(1, 1, 1, 999.99),  
+(1, 5, 1, 19.99),   
+(2, 3, 1, 1999.99), 
+(3, 2, 1, 899.99),  
+(4, 4, 1, 1499.99), 
+(5, 5, 1, 19.99),   
+(5, 6, 1, 29.99),   
+(6, 7, 1, 799.99), 
+(7, 8, 1, 699.99),  
+(8, 9, 1, 499.99),  
+(9, 10, 1, 499.99),
+(10, 1, 1, 999.99), 
+(10, 6, 1, 29.99),  
+(11, 3, 1, 1999.99),
+(11, 4, 1, 1499.99),
+(12, 5, 3, 19.99);  
+
+
+SELECT 
+    c.first_name, 
+    c.last_name, 
+    SUM(o.total_amount) AS total_spent
+FROM 
+    Orders o
+JOIN 
+    Customers c ON o.customer_id = c.customer_id
+GROUP BY 
+    c.customer_id
+ORDER BY 
+    total_spent DESC
+LIMIT 3;
+
+
+
+SELECT 
+    name, 
+    stock
+FROM 
+    Products
+WHERE 
+    stock < 10;
+    
+    
+SELECT 
+    c.category_name, 
+    SUM(oi.quantity * oi.price) AS total_revenue
+FROM 
+    Order_Items oi
+JOIN 
+    Products p ON oi.product_id = p.product_id
+JOIN 
+    Categories c ON p.category_id = c.category_id
+GROUP BY 
+    c.category_name
+ORDER BY 
+    total_revenue DESC;
+    
+    
+    
+    SELECT 
+    o.order_id, 
+    c.first_name, 
+    c.last_name, 
+    p.name AS product_name, 
+    oi.quantity, 
+    oi.price, 
+    o.total_amount
+FROM 
+    Orders o
+JOIN 
+    Customers c ON o.customer_id = c.customer_id
+JOIN 
+    Order_Items oi ON o.order_id = oi.order_id
+JOIN 
+    Products p ON oi.product_id = p.product_id
+ORDER BY 
+    o.order_id;
+    
+    
+    CREATE VIEW order_summary AS
+SELECT 
+    o.order_id,
+    CONCAT(c.first_name, ' ', c.last_name) AS customer_full_name,
+    COUNT(DISTINCT oi.product_id) AS unique_products,
+    SUM(oi.quantity) AS total_quantity,
+    SUM(oi.quantity * oi.price) AS total_order_amount,
+    o.order_date
+FROM 
+    Orders o
+JOIN 
+    Customers c ON o.customer_id = c.customer_id
+JOIN 
+    Order_Items oi ON o.order_id = oi.order_id
+GROUP BY 
+    o.order_id, c.first_name, c.last_name, o.order_date;
+    
+    
+    CREATE TRIGGER AfterOrderItemInsert
+AFTER INSERT ON Order_Items
+FOR EACH ROW
+BEGIN
+    CALL UpdateStockLevel(NEW.ProductID, NEW.Quantity);
+END //
+
+DELIMITER ;
