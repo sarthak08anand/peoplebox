@@ -1,0 +1,79 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f0f0;
+}
+
+.App {
+  text-align: center;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+.breed-list {
+  list-style-type: none;
+  padding: 0;
+  text-align: left;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.breed-list li {
+  margin: 10px 0;
+  cursor: pointer;
+}
+
+.sub-breed-list {
+  list-style-type: none;
+  padding-left: 20px;
+  margin-top: 5px;
+}
+
+.sub-breed-list li {
+  cursor: pointer;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  float: right;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.image-grid img {
+  width: 100%;
+  border-radius: 10px;
+}
